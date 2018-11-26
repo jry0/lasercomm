@@ -54,7 +54,7 @@ int main () {
 
         if (input[i] == 32) { // if character read from file is SPACE (ASCII: 32)
         	usleep(pulseLength);
-        	gpiolib_write_reg(gpio,GPFSET(1), 1 << 17);
+        	gpiolib_write_reg(gpio,GPSET(1), 1 << 17);
         	usleep(pulseLength);
         	gpiolib_write_reg(gpio, GPCLR(0), 1 << 17); 
         }
