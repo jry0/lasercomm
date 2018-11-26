@@ -54,7 +54,7 @@ int main () {
 
         if (input[i] == 32) { // if character read from file is SPACE (ASCII: 32)
         	usleep(pulseLength);
-        	gpiolib_write_reg(gpio,GPSET(1), 1 << 17);
+        	gpiolib_write_reg(gpio,GPFSET(1), 1 << 17);//should it be GPFSET or GPSET? past programs used GPSET but idk if there is a reason you put GPFSET so i won't change it
         	usleep(pulseLength);
         	gpiolib_write_reg(gpio, GPCLR(0), 1 << 17); 
         }
