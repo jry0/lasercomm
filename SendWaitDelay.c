@@ -23,6 +23,9 @@ int main() {
     laser and photodiode to ensure 
     a consistent and reliable connection.
 */
+
+    // ****** Need to start laser here to aid alignment *****
+
     //how long the delay will be in secs. Implemented as int to allow for quick changing.
     //should be set higher than that of the receiving system to accomodate for inaccuracy of usleep. Sending can start after receiving has begun, but the opposite is untrue.
     int delay = 11;
