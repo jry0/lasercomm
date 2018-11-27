@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdio.h> //for the printf() function
 #include <fcntl.h>
-#include <linux/watchdog.h> //needed for the watchdog specific constants
+//#include <linux/watchdog.h> //needed for the watchdog specific constants
 #include <unistd.h>         //needed for sleep
 #include <sys/ioctl.h>      //needed for the ioctl function
 #include <stdlib.h>         //for atoi
@@ -21,31 +21,59 @@ enum State
     DONE
 };
 
-void gpioOn()
-{
-    gpiolib_init_gpio();
 
-    if (gpio == NULL)
-    {
-        perror("Could not init GPIO");
-    }
-
-    uint32_t sel_reg18 = gpiolib_read_ref(gpio, GPFSEL(1)) // (A-z) Ascii output laser, set to pin 18
-
-        sel_reg18 |= 1 << 24;
-
-    gpiolib_write_reg(gpio, GPFSEL(1), sel_reg18);
-
-    uint32_t sel_reg17 = gpiolib_read_ref(gpio, GPFSEL(1)) // Space Ascii output laser, set to pin 17
-
-        sel_reg17 |= 1 << 21;
-
-    gpiolib_write_reg(gpio, GPFSEL(1), sel_reg17);
+//This function will initialize the GPIO pins and handle any error checking
+//for the initialization
+GPIO_Handle initializeGPIO()
+{       
+        //This is the same initialization that was done in Lab 2
+        GPIO_Handle gpio;
+        gpio = gpiolib_init_gpio();
+        if(gpio == NULL)
+        {       
+                perror("Could not initialize GPIO");
+        }
+        return gpio;
 }
 
-void encode(int &input, int CaesarShift)
+//This function will change the appropriate pins value in the select register
+//so that the pin can function as an output
+void setToOutput(GPIO_Handle gpio, int pinNumber)
+{       
+        //Check that the gpio is functional
+        if(gpio == NULL)
+        {       
+                printf("The GPIO has not been intitialized properly \n");
+                return;
+        }
+        
+        //Check that we are trying to set a valid pin number
+        if(pinNumber < 2 || pinNumber > 27)
+        {       
+                printf("Not a valid pinNumer \n");
+                return;
+        }
+        
+        //This will create a variable that has the appropriate select
+        //register number. For more information about the registers
+        //look up BCM 2835.
+        int registerNum = pinNumber / 10;
+        
+        //This will create a variable that is the appropriate amount that
+        //the 1 will need to be shifted by to set the pin to be an output
+        int bitShift = (pinNumber % 10) * 3;
+        
+        //This is the same code that was used in Lab 2, except that it uses
+        //variables for the register number and the bit shift
+        uint32_t sel_reg = gpiolib_read_reg(gpio, GPFSEL(registerNum));
+        sel_reg |= 1  << bitShift;
+        gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
+}
+
+int encode(int input, int CaesarShift)
 {
-    input = input + CaesarShift;
+    int in = input + CaesarShift;
+    return in;
 }
 
 void Send(GPIO_Handle gpio, int ascii)
@@ -90,25 +118,25 @@ void Send(GPIO_Handle gpio, int ascii)
                 break;
             }
         case BLINK1:
-            gpiolib_write_reg(gpio, GPFSET(1), 1 << 18); //turn on laser1
+            gpiolib_write_reg(gpio, GPSET(1), 1 << 18); //turn on laser1
             usleep(200);
             laser1--;                                   //decrement laser1 counter
             gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser1
             s = HUB;
             break;
         case BLINK2:
-            gpiolib_write_reg(gpio, GPFSET(1), 1 << 17); //turn on laser2
+            gpiolib_write_reg(gpio, GPSET(1), 1 << 17); //turn on laser2
             usleep(200);
             laser2--;                                   //decrement laser2 counter
             gpiolib_write_reg(gpio, GPCLR(0), 1 << 17); //turn off laser2
             s = HUB;
             break;
         case BLINK_DONE:
-            gpiolib_write_reg(gpio, GPFSET(1), 1 << 17); //turn on both lasers
-            gpiolib_write_reg(gpio, GPFSET(1), 1 << 18); //turn on both lasers
+            gpiolib_write_reg(gpio, GPSET(1), 1 << 17); //turn on both lasers
+            gpiolib_write_reg(gpio, GPSET(1), 1 << 18); //turn on both lasers
             usleep(200);
-            gpiolib_write_reg(gpio, GPFSET(1), 1 << 17); //turn on both lasers
-            gpiolib_write_reg(gpio, GPFSET(1), 1 << 18); //turn on both lasers
+            gpiolib_write_reg(gpio, GPSET(1), 1 << 17); //turn on both lasers
+            gpiolib_write_reg(gpio, GPSET(1), 1 << 18); //turn on both lasers
             s = DONE;
             break;
         case DONE:
@@ -117,7 +145,7 @@ void Send(GPIO_Handle gpio, int ascii)
     }
 }
 
-int main(int CaesarShift)
+int main(const int argc, const char* const argv[])
 {
     /* 
     This section of the code initializes the GPIO
@@ -126,8 +154,9 @@ int main(int CaesarShift)
     */
 
     GPIO_Handle gpio;
-    gpioOn(); //turn on gpio
-
+    gpio =  initializeGPIO();//turn on gpio
+    setToOutput(gpio,17);
+    setToOutput(gpio,18);
     /*****************************************************/
 
     /* 
@@ -156,7 +185,7 @@ int main(int CaesarShift)
 
     for (int k = 0; k < len; k++)
     {
-        encode(input[k], CaesarShift); //encoding via encode function
+        input[k] = encode(input[k], atof(argv[1])); //encoding via encode function
     }
 
     /***********************************************************************/
