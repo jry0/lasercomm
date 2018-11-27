@@ -9,6 +9,12 @@
 enum State s{START, GOT1, GOT2, GOT0, NEXT, DONE};
 #define LASER1_PIN_NUM 17
 #define LASER2_PIN_NUM 18
+void writting(FILE* output, int ascii){
+	if(ascii != 32){
+		char c = ascii + 64;
+		//idk how the write class works
+	}
+}
 int laserDiodeStatus(GPIO_Handle gpio, int diodeNumber)
 {       
         if(gpio == NULL){
@@ -36,7 +42,7 @@ int laserDiodeStatus(GPIO_Handle gpio, int diodeNumber)
  
 }
 
-int recieve(GPIO_Handle){
+int recieve(GPIO_Handle gpio, FILE* output){
 	int letter = 0;
 	int space = 0;
 	int laser1;
