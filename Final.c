@@ -185,7 +185,7 @@ int main(const int argc, const char* const argv[])
 
     for (int k = 0; k < len; k++)
     {
-        input[k] = encode(input[k], atof(argv[1])); //encoding via encode function
+        input[k] = encode(input[k], atoi(argv[1])); //encoding via encode function
     }
 
     /***********************************************************************/
