@@ -7,6 +7,8 @@
 
 #include <time.h>
 enum State s{START, GOT1, GOT2, GOT0, NEXT, DONE};
+#define LASER1_PIN_NUM 17
+#define LASER2_PIN_NUM 18
 int laserDiodeStatus(GPIO_Handle gpio, int diodeNumber)
 {       
         if(gpio == NULL){
@@ -61,27 +63,22 @@ int recieve(GPIO_Handle){
 			case GOT1:
 				if(!laser1){
 					s = GOT0;
-					break;
 				}
 				break;
 			case GOT2:
 				if(!laser2){
 					s = GOT0;
-					break;
 				}
 				break;
 			case GOT0:
 				if(laser1 == 1 && laser2 == 1){
 					s = next;
-					break;
 				}else if(laser1 == 1){
 					letter++;
 					s = GOT1;
-					break;
 				}else if(laser2){
 					space++;
 					s = GOT2;
-					break;
 				}
 				break;
 			case NEXT:
@@ -90,12 +87,12 @@ int recieve(GPIO_Handle){
 				}else{
 					//write, if space == 1 write a space, if not then add 64 to it and write it to the file 
 					s = START;
-					break;
 				}
+				break;
 			case DONE:
 				break;
 		}
-		usleep(200);
+		usleep(190);
 	}
 	return 0;
 }
