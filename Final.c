@@ -43,9 +43,10 @@ void gpioOn()
     gpiolib_write_reg(gpio, GPFSEL(1), sel_reg17);
 }
 
-void encode(int &input, int CaesarShift)
+int encode(int input, int CaesarShift)
 {
     input = input + CaesarShift;
+    return input;
 }
 
 void Send(GPIO_Handle gpio, int ascii)
@@ -156,7 +157,7 @@ int main(int CaesarShift)
 
     for (int k = 0; k < len; k++)
     {
-        encode(input[k], CaesarShift); //encoding via encode function
+        input[k] = encode(input[k], CaesarShift); //encoding via encode function
     }
 
     /***********************************************************************/
