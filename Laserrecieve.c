@@ -15,7 +15,7 @@ void writting(FILE* output, int ascii){
 	}else if(ascii == 32){
 		char c = ' ';
 	}
-	//write c to output
+	 fprintf(output, "%c", c);
 	
 }
 int laserDiodeStatus(GPIO_Handle gpio, int diodeNumber)
