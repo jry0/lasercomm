@@ -12,8 +12,11 @@ enum State s{START, GOT1, GOT2, GOT0, NEXT, DONE};
 void writting(FILE* output, int ascii){
 	if(ascii != 32){
 		char c = ascii + 64;
-		//idk how the write class works
+	}else if(ascii == 32){
+		char c = ' ';
 	}
+	//write c to output
+	
 }
 int laserDiodeStatus(GPIO_Handle gpio, int diodeNumber)
 {       
