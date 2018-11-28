@@ -22,7 +22,7 @@ GPIO_Handle initializeGPIO()
 
 }
 
-#define LASER1_PIN_NUM 17
+#define LASER1_PIN_NUM 15
 #define LASER2_PIN_NUM 18
 
 
@@ -34,7 +34,7 @@ void writte(FILE* output, int ascii){
 		c = ' ';
 	}
 	printf("%c\n",c);
-	 fprintf(output, "%c", c);
+	fprintf(output, "%c", c);
 	
 }
 
@@ -68,13 +68,13 @@ int laserDiodeStatus(GPIO_Handle gpio, int diodeNumber)
  
 }
 
-int receive(GPIO_Handle gpio, FILE* output){
+void receive(GPIO_Handle gpio, FILE* output){
 	int letter = 0;
+	int prev1;
+	int prev2;
 	int space = 0;
 	int laser1;
 	int laser2;
-	int prev1;
-	int prev2;
 	enum State s = START;
 	while(s != DONE){
 		laser1 = laserDiodeStatus(gpio, 1);
@@ -157,10 +157,9 @@ int main(void) {
     //Counter count how many consecutive cycles the laser is aligned; once past a threshold a message will be displayed
     int consecutiveLaser = 0;
 	
-   /* while (i)
+    while (i)
 	{
         int pin_state = laserDiodeStatus(gpio, 1);
-
 		if(!pin_state) //if pin_state is FALSE (not aligned)
 		{
 			//reset counter. Indicated unstable alignement
@@ -184,7 +183,7 @@ int main(void) {
         //this will act as a (rough) timer. Make sure argument of usleep is equal to how much timer is incremented by
         usleep(1000);
         timer += 1000;
-    }*/
+        }
     printf("hi");
 
 
@@ -197,7 +196,7 @@ int main(void) {
         output = fopen("output.txt" , "a"); //set value of pointer to point to output.txt; will be appending to the file
 	
 	
-	int e =  receive(gpio,output); //Receive, decode, and write the message
+	receive(gpio,output); //Receive, decode, and write the message
 
 	gpiolib_free_gpio(gpio); //Free the GPIO now that the program is over
 }
