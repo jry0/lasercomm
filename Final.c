@@ -97,7 +97,7 @@ void Send(GPIO_Handle gpio, int ascii)
 
     // Initialization of the wacthdog timer
     // watchdog file opened 
-    int wacthdog;
+    int watchdog;
     watchdog = open("/dev/watchdog", O_RDWR | O_NOCTTY);
     // timer set to 15 seconds
     int timeout = 15;
@@ -113,7 +113,7 @@ void Send(GPIO_Handle gpio, int ascii)
         case HUB:
         	//kicks the watchdog, resetting the timer to 0
         	//state machine returns to HUB after each state
-        	ioctl(watchdog, WDIOC_KEEPALIVE, 0)
+        	ioctl(watchdog, WDIOC_KEEPALIVE, 0);
 
             if (laser1 == 0 && laser2 == 0)
             {
