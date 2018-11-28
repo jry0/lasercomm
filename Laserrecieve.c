@@ -33,6 +33,7 @@ void writte(FILE* output, int ascii){
 	}else if(ascii == 32){
 		c = ' ';
 	}
+	printf("%c\n",c);
 	 fprintf(output, "%c", c);
 	
 }
@@ -156,7 +157,7 @@ int main(void) {
     //Counter count how many consecutive cycles the laser is aligned; once past a threshold a message will be displayed
     int consecutiveLaser = 0;
 	
-    while (i)
+   /* while (i)
 	{
         int pin_state = laserDiodeStatus(gpio, 1);
 
@@ -183,7 +184,7 @@ int main(void) {
         //this will act as a (rough) timer. Make sure argument of usleep is equal to how much timer is incremented by
         usleep(1000);
         timer += 1000;
-    }
+    }*/
     printf("hi");
 
 
