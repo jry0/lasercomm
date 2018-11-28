@@ -68,7 +68,7 @@ int laserDiodeStatus(GPIO_Handle gpio, int diodeNumber)
  
 }
 
-int recieve(GPIO_Handle gpio, FILE* output){
+int receive(GPIO_Handle gpio, FILE* output){
 	int letter = 0;
 	int space = 0;
 	int laser1;
