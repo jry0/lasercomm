@@ -94,7 +94,10 @@ int recieve(GPIO_Handle gpio, FILE* output){
 				if(space == 2){
 					s = DONE;
 				}else{
-					//write, if space == 1 write a space, if not then add 64 to it and write it to the file 
+					if(space == 1){
+						writting(output,32);
+					}else{
+						writting(output,ascii);
 					s = START;
 				}
 				break;
