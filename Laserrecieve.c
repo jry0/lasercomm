@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 #include <time.h>
-enum State s{START, GOT1, GOT2, GOT0, NEXT, DONE};
+enum State{START, GOT1, GOT2, GOT0, NEXT, DONE};
 
 GPIO_Handle initializeGPIO()
 {
@@ -26,11 +26,12 @@ GPIO_Handle initializeGPIO()
 #define LASER2_PIN_NUM 18
 
 
-void write(FILE* output, int ascii){
+void writte(FILE* output, int ascii){
+	char c = 0;
 	if(ascii != 32){
-		char c = ascii + 64;
+		c = ascii + 64;
 	}else if(ascii == 32){
-		char c = ' ';
+		c = ' ';
 	}
 	 fprintf(output, "%c", c);
 	
@@ -102,7 +103,7 @@ int recieve(GPIO_Handle gpio, FILE* output){
 				break;
 			case GOT0:
 				if(laser1 == 1 && laser2 == 1){
-					s = next;
+					s = NEXT;
 				}else if(laser1 == 1){
 					letter++;
 					s = GOT1;
@@ -116,18 +117,19 @@ int recieve(GPIO_Handle gpio, FILE* output){
 					s = DONE;
 				}else{
 					if(space == 1){
-						write(output,32);
+						writte(output,32);
 					}else{
-						write(output,ascii);
+						writte(output,letter);
 					s = START;
 				}
 				break;
 			case DONE:
 				break;
-		}
+			}
 		usleep(190);
+		}
 	}
-	return 0;
+return 0;
 }
 
 int main(void) {
@@ -141,6 +143,7 @@ int main(void) {
     laser and photodiode to ensure 
     a consistent and reliable connection.
 */
+    GPIO_Handle gpio = initializeGPIO();
     //how long the delay will be in secs. Implemented as int to allow for quick changing
     int delay = 10;
 
@@ -192,9 +195,8 @@ int main(void) {
     
         output = fopen("output.txt" , "a"); //set value of pointer to point to output.txt; will be appending to the file
 	
-	GPIO_Handle gpio = initializeGPIO(); //initialize gpio
 	
-	receive(gpio,output); //Receive, decode, and write the message
+	int e =  receive(gpio,output); //Receive, decode, and write the message
 
 	gpiolib_free_gpio(gpio); //Free the GPIO now that the program is over
 }
