@@ -109,3 +109,10 @@ int recieve(GPIO_Handle gpio, FILE* output){
 	return 0;
 }
 
+int main(void){
+	FILE* output; //output file pointer
+    
+        output = fopen("output.txt" , "a"); //set value of pointer to point to output.txt; will be appending to the file
+	//initialize gpio
+	receive(gpio,output);
+}
