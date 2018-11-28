@@ -200,6 +200,4 @@ int main(void) {
 	int e =  receive(gpio,output); //Receive, decode, and write the message
 
 	gpiolib_free_gpio(gpio); //Free the GPIO now that the program is over
-
-	return 0;
 }
