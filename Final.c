@@ -95,6 +95,15 @@ void Send(GPIO_Handle gpio, int ascii)
         laser2 = 2; //done (received something invalid, indicating end of transmission)
     }
 
+    // Initialization of the wacthdog timer
+    // watchdog file opened 
+    int wacthdog;
+    watchdog = open("/dev/watchdog", O_RDWR | O_NOCTTY);
+    // timer set to 15 seconds
+    int timeout = 15;
+    ioctl(watchdog, WDIOC_SETTIMEOUT, &timeout);
+
+
     enum State s = HUB;
 
     while (s != DONE)
@@ -102,6 +111,10 @@ void Send(GPIO_Handle gpio, int ascii)
         switch (s)
         {
         case HUB:
+        	//kicks the watchdog, resetting the timer to 0
+        	//state machine returns to HUB after each state
+        	ioctl(watchdog, WDIOC_KEEPALIVE, 0)
+
             if (laser1 == 0 && laser2 == 0)
             {
                 s = BLINK_DONE; //blink both lights to indicate end of transmission
@@ -132,11 +145,14 @@ void Send(GPIO_Handle gpio, int ascii)
             s = HUB;
             break;
         case BLINK_DONE:
-            gpiolib_write_reg(gpio, GPSET(1), 1 << 17); //turn on both lasers
-            gpiolib_write_reg(gpio, GPSET(1), 1 << 18); //turn on both lasers
+            gpiolib_write_reg(gpio, GPSET(1), 1 << 17); //turn on laser 1
+            gpiolib_write_reg(gpio, GPSET(1), 1 << 18); //turn on laser 2
             usleep(200);
-            gpiolib_write_reg(gpio, GPSET(1), 1 << 17); //turn on both lasers
-            gpiolib_write_reg(gpio, GPSET(1), 1 << 18); //turn on both lasers
+            gpiolib_write_reg(gpio, GPCLR(1), 1 << 17); //turn off laser 1
+            gpiolib_write_reg(gpio, GPCLR(1), 1 << 18); //turn off laser 2
+
+            write(watchdog, "V", 1); //writes "V" to watchdog file to disable watchdog, prevents system resets
+            close(watchdog); //closes watchdog file
             s = DONE;
             break;
         case DONE:
