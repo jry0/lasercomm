@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdio.h> //for the printf() function
 #include <fcntl.h>
-//#include <linux/watchdog.h> //needed for the watchdog specific constants
+#include <linux/watchdog.h> //needed for the watchdog specific constants
 #include <unistd.h>         //needed for sleep
 #include <sys/ioctl.h>      //needed for the ioctl function
 #include <stdlib.h>         //for atoi
@@ -96,9 +96,13 @@ void Send(GPIO_Handle gpio, int ascii)
     }
 
     // Initialization of the wacthdog timer
-    // set to 15 seconds
+    // watchdog file opened 
+    int wacthdog;
+    watchdog = open("/dev/watchdog", O_RDWR | O_NOCTTY);
+    // timer set to 15 seconds
     int timeout = 15;
     ioctl(watchdog, WDIOC_SETTIMEOUT, &timeout);
+
 
     enum State s = HUB;
 
