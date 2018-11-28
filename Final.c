@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdio.h> //for the printf() function
 #include <fcntl.h>
-//#include <linux/watchdog.h> //needed for the watchdog specific constants
+#include <linux/watchdog.h> //needed for the watchdog specific constants
 #include <unistd.h>         //needed for sleep
 #include <sys/ioctl.h>      //needed for the ioctl function
 #include <stdlib.h>         //for atoi
