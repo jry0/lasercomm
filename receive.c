@@ -22,7 +22,7 @@ GPIO_Handle initializeGPIO()
 
 }
 
-#define LASER1_PIN_NUM 15
+#define LASER1_PIN_NUM 14
 #define LASER2_PIN_NUM 18
 
 
