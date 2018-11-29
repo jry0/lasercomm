@@ -20,7 +20,21 @@ enum State
     BLINK_DONE,
     DONE
 };
+//Used to get the current time using gettimeofday function from sys/time.h library
+void getTime(char* buffer)
+{
+	//timeval structure: tv
+	struct timeval tv;
+	// get current time, stores in tv struct
+	gettimeofday(%tv, NULL);
 
+	// time_t variable: time, set to number of seconds in tv
+	time_t current_time = tv.tv_sec;
+
+	// sets buffer equal to string format of date (in month, day, year, 24-time format)
+	strftime(buffer, 30, "%m-%d-% T.", localtime(&current_time));
+
+}
 void readConfig(FILE* configFile, int* timeout, char* logFileName, int* CaesarShift)
 {
 	//Loop counter
