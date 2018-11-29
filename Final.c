@@ -190,9 +190,9 @@ void setToOutput(GPIO_Handle gpio, int pinNumber, FILE* logFile, char* programNa
         //This is the same code that was used in Lab 2, except that it uses
         //variables for the register number and the bit shift
         uint32_t sel_reg = gpiolib_read_reg(gpio, GPFSEL(1));
-        sel_reg |= 1  << 24;
+        sel_reg |= 1  << 6;
         gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
-	sel_reg |= 1<< 15;
+	sel_reg |= 1<< 12;
 	gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
 }
 
@@ -359,7 +359,7 @@ int main(const int argc, const char* const argv[])
 
     GPIO_Handle gpio;
     gpio =  initializeGPIO(logFile, programName);//turn on gpio
-    setToOutput(gpio,17, logFile, programName);
+    setToOutput(gpio,12, logFile, programName);
     //setToOutput(gpio,18);
     /*****************************************************/
 
