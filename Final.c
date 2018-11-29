@@ -21,6 +21,98 @@ enum State
     DONE
 };
 
+void readConfig(FILE* configFile, int* timeout, char* logFileName, int* CaesarShift)
+{
+	//Loop counter
+	int i = 0;
+	
+	//A char array to act as a buffer for the file
+	char buffer[255];
+
+	//The value of the timeout variable is set to zero at the start
+	*timeout = 0;
+
+	//The value of the numBlinks variable is set to zero at the start
+	*CaesarShift = 0;
+
+	//This is a variable used to track which input we are currently looking
+	//for (timeout, logFileName or numBlinks)
+	int input = 0;
+
+	//This will 
+	//fgets(buffer, 255, configFile);
+	//This will check that the file can still be read from and if it can,
+	//then the loop will check to see if the line may have any useful 
+	//information.
+	while(fgets(buffer, 255, configFile) != NULL)
+	{
+		i = 0;
+		//If the starting character of the string is a '#', 
+		//then we can ignore that line
+		if(buffer[i] != '#')
+		{
+			while(buffer[i] != 0)
+			{
+				//This if will check the value of timeout
+				if(buffer[i] == '=' && input == 0)
+				{
+					//The loop runs while the character is not null
+					while(buffer[i] != 0)
+					{
+						//If the character is a number from 0 to 9
+						if(buffer[i] >= '0' && buffer[i] <= '9')
+						{
+							//Move the previous digits up one position and add the
+							//new digit
+							*timeout = (*timeout *10) + (buffer[i] - '0');
+						}
+						i++;
+					}
+					input++;
+				}
+				else if(buffer[i] == '=' && input == 1) //This will find the name of the log file
+				{
+					int j = 0;
+					//Loop runs while the character is not a newline or null
+					while(buffer[i] != 0  && buffer[i] != '\n')
+					{
+						//If the characters after the equal sign are not spaces or
+						//equal signs, then it will add that character to the string
+						if(buffer[i] != ' ' && buffer[i] != '=')
+						{
+							logFileName[j] = buffer[i];
+							j++;
+						}
+						i++;
+					}
+					//Add a null terminator at the end
+					logFileName[j] = 0;
+					input++;
+				}
+				else if(buffer[i] == '=' && input == 2) //This will find the value of numBlinks
+				{
+					//The loop runs while the character is not null
+					while(buffer[i] != 0)
+					{
+						//If the character is a number from 0 to 9
+						if(buffer[i] >= '0' && buffer[i] <= '9')
+						{
+							//Move the previous digits up one position and add the
+							//new digit
+							*CaesarShift = (*CaesarShift *10) + (buffer[i] - '0');
+						}
+						i++;
+					}
+					input++;
+				}
+				else
+				{
+					i++;
+				}
+			}
+		}
+	}
+}
 
 //This function will initialize the GPIO pins and handle any error checking
 //for the initialization
@@ -172,6 +264,17 @@ void Send(GPIO_Handle gpio, int ascii)
 
 int main(const int argc, const char* const argv[])
 {
+    /*
+    This section of the code gets info from the
+    config file to configure the program
+    */
+
+   	int timeout = 0;
+	char logFileName[50];
+	int CaesarShift = 0;
+
+   readConfig(configFile, &timeout, logFileName, &CaesarShift);
+    
     /* 
     This section of the code initializes the GPIO
     stuff. Makes the lasers ready to lase and the
