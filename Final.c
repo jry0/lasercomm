@@ -65,9 +65,11 @@ void setToOutput(GPIO_Handle gpio, int pinNumber)
         
         //This is the same code that was used in Lab 2, except that it uses
         //variables for the register number and the bit shift
-        uint32_t sel_reg = gpiolib_read_reg(gpio, GPFSEL(registerNum));
-        sel_reg |= 1  << bitShift;
+        uint32_t sel_reg = gpiolib_read_reg(gpio, GPFSEL(1));
+        sel_reg |= 1  << 24;
         gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
+	sel_reg |= 1<< 15;
+	gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
 }
 
 int encode(int input, int CaesarShift)
@@ -131,26 +133,33 @@ void Send(GPIO_Handle gpio, int ascii)
                 break;
             }
         case BLINK1:
-            gpiolib_write_reg(gpio, GPSET(1), 1 << 18); //turn on laser1
-            usleep(200);
+		printf("hi");
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 15); //turn on laser1
+            usleep(2000);
+		printf("bye");
             laser1--;                                   //decrement laser1 counter
-            gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser1
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 15); 
+		usleep(2000);//turn off laser1
+		printf("si");
             s = HUB;
             break;
         case BLINK2:
-            gpiolib_write_reg(gpio, GPSET(1), 1 << 17); //turn on laser2
-            usleep(200);
+		printf("hello");
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser2
+            usleep(2000);
             laser2--;                                   //decrement laser2 counter
-            gpiolib_write_reg(gpio, GPCLR(0), 1 << 17); //turn off laser2
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser2
             s = HUB;
+		usleep(2000);
             break;
         case BLINK_DONE:
-            gpiolib_write_reg(gpio, GPSET(1), 1 << 17); //turn on laser 1
-            gpiolib_write_reg(gpio, GPSET(1), 1 << 18); //turn on laser 2
-            usleep(200);
-            gpiolib_write_reg(gpio, GPCLR(1), 1 << 17); //turn off laser 1
-            gpiolib_write_reg(gpio, GPCLR(1), 1 << 18); //turn off laser 2
-
+		printf("good");
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser 1
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 15); //turn on laser 2
+            usleep(2000);
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser 1
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 15); //turn off laser 2
+		usleep(2000);
             write(watchdog, "V", 1); //writes "V" to watchdog file to disable watchdog, prevents system resets
             close(watchdog); //closes watchdog file
             s = DONE;
@@ -172,7 +181,7 @@ int main(const int argc, const char* const argv[])
     GPIO_Handle gpio;
     gpio =  initializeGPIO();//turn on gpio
     setToOutput(gpio,17);
-    setToOutput(gpio,18);
+    //setToOutput(gpio,18);
     /*****************************************************/
 
     /* 
@@ -201,7 +210,9 @@ int main(const int argc, const char* const argv[])
 
     for (int k = 0; k < len; k++)
     {
+	printf("1");
         input[k] = encode(input[k], atoi(argv[1])); //encoding via encode function
+	
     }
 
     /***********************************************************************/
@@ -228,7 +239,7 @@ int main(const int argc, const char* const argv[])
 
     int timer = 0; // timer. Not using gettime methods because no need for precise timing here
 
-    while (i)
+    /*while (i)
     {
         if (timer >= 1000000 * delay)
         {
@@ -238,9 +249,10 @@ int main(const int argc, const char* const argv[])
         timer += 1000;
     }
     printf("hi");
-    for (int j = 0; j < len; j++) //loop to send laser pulses using "Send" function
+    */for (int j = 0; j < len; j++) //loop to send laser pulses using "Send" function
     {
-        Send(gpio, input[i]);
+	printf("%d\n", input[j]);
+        Send(gpio, input[j]);
     }
     Send(gpio, 0);
 
