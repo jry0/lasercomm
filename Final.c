@@ -41,7 +41,7 @@ void getTime(char* buffer)
 	//timeval structure: tv
 	struct timeval tv;
 	// get current time, stores in tv struct
-	gettimeofday(%tv, NULL);
+	gettimeofday(&tv, NULL);
 
 	// time_t variable: time, set to number of seconds in tv
 	time_t current_time = tv.tv_sec;
@@ -147,7 +147,7 @@ void readConfig(FILE* configFile, int* timeout, char* logFileName, int* CaesarSh
 
 //This function will initialize the GPIO pins and handle any error checking
 //for the initialization
-GPIO_Handle initializeGPIO(FILE* logFile, String programName)
+GPIO_Handle initializeGPIO(FILE* logFile, char programName)
 {       
         //This is the same initialization that was done in Lab 2
         GPIO_Handle gpio;
@@ -163,7 +163,7 @@ GPIO_Handle initializeGPIO(FILE* logFile, String programName)
 
 //This function will change the appropriate pins value in the select register
 //so that the pin can function as an output
-void setToOutput(GPIO_Handle gpio, int pinNumber, FILE* logFile, String programName)
+void setToOutput(GPIO_Handle gpio, int pinNumber, FILE* logFile, char programName)
 {       
         //Check that the gpio is functional
         if(gpio == NULL)
@@ -203,7 +203,7 @@ int encode(int input, int CaesarShift)
     return in;
 }
 
-void Send(GPIO_Handle gpio, int ascii, FILE* logFile, String programName, int timeout)
+void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char programName, int timeout)
 {
 
 
@@ -368,8 +368,8 @@ int main(const int argc, const char* const argv[])
     */
 
     GPIO_Handle gpio;
-    gpio =  initializeGPIO(logFile, logFileString);//turn on gpio
-    setToOutput(gpio,17, logFile, logFileString);
+    gpio =  initializeGPIO(logFile, programName);//turn on gpio
+    setToOutput(gpio,17, logFile, programName);
     //setToOutput(gpio,18);
     /*****************************************************/
 
