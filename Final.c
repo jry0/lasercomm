@@ -51,7 +51,6 @@ void getTime(char* buffer)
 
 }
 
-void LOG_MSG
 void readConfig(FILE* configFile, int* timeout, char* logFileName, int* CaesarShift)
 {
 	//Loop counter
@@ -157,7 +156,7 @@ GPIO_Handle initializeGPIO(FILE* logFile, char programName)
         {       
                 perror("Could not initialize GPIO");
         }
-        LOG_MSG(logFile, time, programName, "Pin 17 has been set to output\n\n");
+        LOG_MSG(logFile, time, programName, "INFO", "Pin 17 has been set to output\n\n");
         return gpio;
 }
 
@@ -205,16 +204,7 @@ int encode(int input, int CaesarShift)
 
 void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char programName, int timeout)
 {
-
-
-    
-    //Check that the file opens properly.
-	if(!configFile)
-	{
-		perror("The config file could not be opened");
-		return -1;
-	}
-    
+   
     int laser2 = 0; //how many times laser2 needs to blink
 
     int laser1 = 0; //how many times laser1 needs to blink
