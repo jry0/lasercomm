@@ -135,31 +135,31 @@ void Send(GPIO_Handle gpio, int ascii)
         case BLINK1:
 		printf("hi");
             gpiolib_write_reg(gpio, GPSET(0), 1 << 15); //turn on laser1
-            usleep(2000);
+            usleep(200000);
 		printf("bye");
             laser1--;                                   //decrement laser1 counter
             gpiolib_write_reg(gpio, GPCLR(0), 1 << 15); 
-		usleep(2000);//turn off laser1
+		usleep(200000);//turn off laser1
 		printf("si");
             s = HUB;
             break;
         case BLINK2:
 		printf("hello");
             gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser2
-            usleep(2000);
+            usleep(200000);
             laser2--;                                   //decrement laser2 counter
             gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser2
             s = HUB;
-		usleep(2000);
+		usleep(200000);
             break;
         case BLINK_DONE:
 		printf("good");
             gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser 1
             gpiolib_write_reg(gpio, GPSET(0), 1 << 15); //turn on laser 2
-            usleep(2000);
+            usleep(200000);
             gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser 1
             gpiolib_write_reg(gpio, GPCLR(0), 1 << 15); //turn off laser 2
-		usleep(2000);
+		usleep(200000);
             write(watchdog, "V", 1); //writes "V" to watchdog file to disable watchdog, prevents system resets
             close(watchdog); //closes watchdog file
             s = DONE;
