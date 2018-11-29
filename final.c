@@ -21,6 +21,98 @@ enum State
     DONE
 };
 
+void readConfig(FILE* configFile, int* timeout, char* logFileName, int* CaesarShift)
+{
+	//Loop counter
+	int i = 0;
+	
+	//A char array to act as a buffer for the file
+	char buffer[255];
+
+	//The value of the timeout variable is set to zero at the start
+	*timeout = 0;
+
+	//The value of the numBlinks variable is set to zero at the start
+	*CaesarShift = 0;
+
+	//This is a variable used to track which input we are currently looking
+	//for (timeout, logFileName or numBlinks)
+	int input = 0;
+
+	//This will 
+	//fgets(buffer, 255, configFile);
+	//This will check that the file can still be read from and if it can,
+	//then the loop will check to see if the line may have any useful 
+	//information.
+	while(fgets(buffer, 255, configFile) != NULL)
+	{
+		i = 0;
+		//If the starting character of the string is a '#', 
+		//then we can ignore that line
+		if(buffer[i] != '#')
+		{
+			while(buffer[i] != 0)
+			{
+				//This if will check the value of timeout
+				if(buffer[i] == '=' && input == 0)
+				{
+					//The loop runs while the character is not null
+					while(buffer[i] != 0)
+					{
+						//If the character is a number from 0 to 9
+						if(buffer[i] >= '0' && buffer[i] <= '9')
+						{
+							//Move the previous digits up one position and add the
+							//new digit
+							*timeout = (*timeout *10) + (buffer[i] - '0');
+						}
+						i++;
+					}
+					input++;
+				}
+				else if(buffer[i] == '=' && input == 1) //This will find the name of the log file
+				{
+					int j = 0;
+					//Loop runs while the character is not a newline or null
+					while(buffer[i] != 0  && buffer[i] != '\n')
+					{
+						//If the characters after the equal sign are not spaces or
+						//equal signs, then it will add that character to the string
+						if(buffer[i] != ' ' && buffer[i] != '=')
+						{
+							logFileName[j] = buffer[i];
+							j++;
+						}
+						i++;
+					}
+					//Add a null terminator at the end
+					logFileName[j] = 0;
+					input++;
+				}
+				else if(buffer[i] == '=' && input == 2) //This will find the value of numBlinks
+				{
+					//The loop runs while the character is not null
+					while(buffer[i] != 0)
+					{
+						//If the character is a number from 0 to 9
+						if(buffer[i] >= '0' && buffer[i] <= '9')
+						{
+							//Move the previous digits up one position and add the
+							//new digit
+							*CaesarShift = (*CaesarShift *10) + (buffer[i] - '0');
+						}
+						i++;
+					}
+					input++;
+				}
+				else
+				{
+					i++;
+				}
+			}
+		}
+	}
+}
 
 //This function will initialize the GPIO pins and handle any error checking
 //for the initialization
@@ -65,9 +157,11 @@ void setToOutput(GPIO_Handle gpio, int pinNumber)
         
         //This is the same code that was used in Lab 2, except that it uses
         //variables for the register number and the bit shift
-        uint32_t sel_reg = gpiolib_read_reg(gpio, GPFSEL(registerNum));
-        sel_reg |= 1  << bitShift;
+        uint32_t sel_reg = gpiolib_read_reg(gpio, GPFSEL(1));
+        sel_reg |= 1  << 24;
         gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
+	sel_reg |= 1<< 15;
+	gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
 }
 
 int encode(int input, int CaesarShift)
@@ -97,7 +191,7 @@ void Send(GPIO_Handle gpio, int ascii)
 
     // Initialization of the wacthdog timer
     // watchdog file opened 
-    int wacthdog;
+    int watchdog;
     watchdog = open("/dev/watchdog", O_RDWR | O_NOCTTY);
     // timer set to 15 seconds
     int timeout = 15;
@@ -113,7 +207,7 @@ void Send(GPIO_Handle gpio, int ascii)
         case HUB:
         	//kicks the watchdog, resetting the timer to 0
         	//state machine returns to HUB after each state
-        	ioctl(watchdog, WDIOC_KEEPALIVE, 0)
+        	ioctl(watchdog, WDIOC_KEEPALIVE, 0);
 
             if (laser1 == 0 && laser2 == 0)
             {
@@ -131,26 +225,33 @@ void Send(GPIO_Handle gpio, int ascii)
                 break;
             }
         case BLINK1:
-            gpiolib_write_reg(gpio, GPSET(1), 1 << 18); //turn on laser1
-            usleep(200);
+		printf("hi");
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 15); //turn on laser1
+            usleep(2000);
+		printf("bye");
             laser1--;                                   //decrement laser1 counter
-            gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser1
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 15); 
+		usleep(2000);//turn off laser1
+		printf("si");
             s = HUB;
             break;
         case BLINK2:
-            gpiolib_write_reg(gpio, GPSET(1), 1 << 17); //turn on laser2
-            usleep(200);
+		printf("hello");
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser2
+            usleep(2000);
             laser2--;                                   //decrement laser2 counter
-            gpiolib_write_reg(gpio, GPCLR(0), 1 << 17); //turn off laser2
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser2
             s = HUB;
+		usleep(2000);
             break;
         case BLINK_DONE:
-            gpiolib_write_reg(gpio, GPSET(1), 1 << 17); //turn on laser 1
-            gpiolib_write_reg(gpio, GPSET(1), 1 << 18); //turn on laser 2
-            usleep(200);
-            gpiolib_write_reg(gpio, GPCLR(1), 1 << 17); //turn off laser 1
-            gpiolib_write_reg(gpio, GPCLR(1), 1 << 18); //turn off laser 2
-
+		printf("good");
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser 1
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 15); //turn on laser 2
+            usleep(2000);
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser 1
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 15); //turn off laser 2
+		usleep(2000);
             write(watchdog, "V", 1); //writes "V" to watchdog file to disable watchdog, prevents system resets
             close(watchdog); //closes watchdog file
             s = DONE;
@@ -163,6 +264,17 @@ void Send(GPIO_Handle gpio, int ascii)
 
 int main(const int argc, const char* const argv[])
 {
+    /*
+    This section of the code gets info from the
+    config file to configure the program
+    */
+
+   	int timeout = 0;
+	char logFileName[50];
+	int CaesarShift = 0;
+
+   readConfig(configFile, &timeout, logFileName, &CaesarShift);
+    
     /* 
     This section of the code initializes the GPIO
     stuff. Makes the lasers ready to lase and the
@@ -172,7 +284,7 @@ int main(const int argc, const char* const argv[])
     GPIO_Handle gpio;
     gpio =  initializeGPIO();//turn on gpio
     setToOutput(gpio,17);
-    setToOutput(gpio,18);
+    //setToOutput(gpio,18);
     /*****************************************************/
 
     /* 
@@ -201,7 +313,9 @@ int main(const int argc, const char* const argv[])
 
     for (int k = 0; k < len; k++)
     {
+	printf("1");
         input[k] = encode(input[k], atoi(argv[1])); //encoding via encode function
+	
     }
 
     /***********************************************************************/
@@ -228,7 +342,7 @@ int main(const int argc, const char* const argv[])
 
     int timer = 0; // timer. Not using gettime methods because no need for precise timing here
 
-    while (i)
+    /*while (i)
     {
         if (timer >= 1000000 * delay)
         {
@@ -238,9 +352,10 @@ int main(const int argc, const char* const argv[])
         timer += 1000;
     }
     printf("hi");
-    for (int j = 0; j < len; j++) //loop to send laser pulses using "Send" function
+    */for (int j = 0; j < len; j++) //loop to send laser pulses using "Send" function
     {
-        Send(gpio, input[i]);
+	printf("%d\n", input[j]);
+        Send(gpio, input[j]);
     }
     Send(gpio, 0);
 
