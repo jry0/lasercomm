@@ -85,7 +85,7 @@ void receive(GPIO_Handle gpio, FILE* output){
 			case START:
 				if(laser1 == 1){
 					letter++;
-printf("hello 5d\n",letter);
+printf("hello %d\n",laser1);
 					s = GOT1;
 					break;
 				}else if(laser2 == 1){
@@ -138,15 +138,6 @@ printf("%d\n", space);
 
 int main(const int argc, const char* const argv[]) {
 
-	/* 
-    This section of the code waits
-    for ten seconds and prints out
-    the status of the photodiode.
-    The purpose of this is to allow
-    the user to properly align the
-    laser and photodiode to ensure 
-    a consistent and reliable connection.
-*/
 printf("start");
     GPIO_Handle gpio = initializeGPIO();
 printf("GPO");
@@ -206,4 +197,3 @@ printf("GPO");
 	gpiolib_free_gpio(gpio); //Free the GPIO now that the program is over
 return 0;
 }
-
