@@ -27,7 +27,7 @@ GPIO_Handle initializeGPIO()
 #define LASER2_PIN_NUM 18
 
 
-void writte(FILE* output, int ascii){
+void writte(int ascii){
 	char c = 0;
 	if(ascii != 32){
 printf("hii");
@@ -35,10 +35,21 @@ printf("hii");
 	}else if(ascii == 32){
 		c = ' ';
 	}
-	printf("%c\n",c);
+	
+	static FILE* output; //output file pointer
+    
+        static output = fopen("output.txt" , "a"); //set value of pointer to point to output.txt; will be appending to the file
+	
+	if(output == NULL){
+             printf("bad");
+}else{
+fprintf(output,"s");
+printf("good");
+}
+printf("%c\n",c);
 	fprintf(output, "%c", c);
 printf("gu");
-	
+
 }
 
 //This function should accept the diode number (1 or 2) and output
@@ -71,7 +82,7 @@ int laserDiodeStatus(GPIO_Handle gpio, int diodeNumber)
  
 }
 
-void receive(GPIO_Handle gpio, FILE* output){
+void receive(GPIO_Handle gpio){
 	int letter = 0;
 	int prev1;
 	int prev2;
@@ -125,11 +136,11 @@ printf("bye");
 				}else{
 					if(space == 1){
 printf("%d\n", space);
-						writte(output,32);
+						writte(32);
 						s = START;
 						space = 0;
 					}else{
-						writte(output,letter + 64);
+						writte(letter + 64);
 						letter = 0;
 					s = START;
 				}
@@ -192,9 +203,9 @@ printf("GPO");
      decodes, and writes the incoming transmission to a 
      text file. The juicy part of the code, if you will */
 
-	FILE* output; //output file pointer
+/*	static FILE* output; //output file pointer
     
-        output = fopen("output.txt" , "a"); //set value of pointer to point to output.txt; will be appending to the file
+        static output = fopen("output.txt" , "a"); //set value of pointer to point to output.txt; will be appending to the file
 	
 	if(output == NULL){
              printf("bad");
@@ -207,9 +218,9 @@ printf("good");
 	for (int i = 0; i < len; i++) {
 		writte(output, write[i]);
 }
-	
+*/	
 
-	//receive(gpio,output); //Receive, decode, and write the message
+	receive(gpio); //Receive, decode, and write the message
 
 	gpiolib_free_gpio(gpio); //Free the GPIO now that the program is over
 return 0;
