@@ -12,6 +12,21 @@
 #include <time.h>           //for time_t and the time() function
 #include <sys/time.h>       //for gettimeofday()
 
+/*Defined macro for logging information. 
++fileName will be file pointer to log file
++time will be current time in string format (format listed in getTime function)
++programName will be name of program
++sev will be the serverity of the message (debug, info, warning, error, critical)
++str +will be message that will be printed*/
+
+#define LOG_MSG(fileName, time, programName, sev, str) \
+	do{ \
+		fprintf(logFile, "%s : %s : %s : %s", time, programName, sev, str); \
+		fflush(logFile); \
+	}while(0)
+
+
+
 enum State
 {
     HUB,
@@ -20,6 +35,21 @@ enum State
     BLINK_DONE,
     DONE
 };
+//Used to get the current time using gettimeofday function from sys/time.h library
+void getTime(char* buffer)
+{
+	//timeval structure: tv
+	struct timeval tv;
+	// get current time, stores in tv struct
+	gettimeofday(&tv, NULL);
+
+	// time_t variable: time, set to number of seconds in tv
+	time_t current_time = tv.tv_sec;
+
+	// sets buffer equal to string format of date (in month, day, year, 24-time format)
+	strftime(buffer, 30, "%m-%d-% T.", localtime(&current_time));
+
+}
 
 void readConfig(FILE* configFile, int* timeout, char* logFileName, int* CaesarShift)
 {
@@ -116,21 +146,23 @@ void readConfig(FILE* configFile, int* timeout, char* logFileName, int* CaesarSh
 
 //This function will initialize the GPIO pins and handle any error checking
 //for the initialization
-GPIO_Handle initializeGPIO()
+GPIO_Handle initializeGPIO(FILE* logFile, char* programName)
 {       
         //This is the same initialization that was done in Lab 2
         GPIO_Handle gpio;
         gpio = gpiolib_init_gpio();
+
         if(gpio == NULL)
         {       
                 perror("Could not initialize GPIO");
         }
+        LOG_MSG(logFile, time, programName, "INFO", "Pin 17 has been set to output\n\n");
         return gpio;
 }
 
 //This function will change the appropriate pins value in the select register
 //so that the pin can function as an output
-void setToOutput(GPIO_Handle gpio, int pinNumber)
+void setToOutput(GPIO_Handle gpio, int pinNumber, FILE* logFile, char* programName)
 {       
         //Check that the gpio is functional
         if(gpio == NULL)
@@ -170,8 +202,9 @@ int encode(int input, int CaesarShift)
     return in;
 }
 
-void Send(GPIO_Handle gpio, int ascii)
+void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char programName, int timeout)
 {
+   
     int laser2 = 0; //how many times laser2 needs to blink
 
     int laser1 = 0; //how many times laser1 needs to blink
@@ -193,8 +226,8 @@ void Send(GPIO_Handle gpio, int ascii)
     // watchdog file opened 
     int watchdog;
     watchdog = open("/dev/watchdog", O_RDWR | O_NOCTTY);
-    // timer set to 15 seconds
-    int timeout = 15;
+    
+    // timer set to timeout value from config file
     ioctl(watchdog, WDIOC_SETTIMEOUT, &timeout);
 
 
@@ -264,17 +297,60 @@ void Send(GPIO_Handle gpio, int ascii)
 
 int main(const int argc, const char* const argv[])
 {
+	//Create a string to store program name
+	const char* argName = argv[0];
+
+	//Variables used to determine length of program name
+	int i = 0;
+	int namelength = 0;
+
+	while(argName[i] != 0)
+	{
+		namelength++;
+		i++;
+	} 
+
+	char programName[namelength];
+
+	i = 0;
+
+	//Copy the name of the program without the ./ at the start
+	//of argv[0]
+	while(argName[i + 2] != 0)
+	{
+		programName[i] = argName[i + 2];
+		i++;
+	} 	
+
+	// Create file pointer to config file, set to read configureMcConfigureFace
+	FILE* configFile;
+	configFile = fopen("/home/pi/configureMcConfigureFace.cfg", "r");
+   
     /*
     This section of the code gets info from the
     config file to configure the program
     */
-
    	int timeout = 0;
 	char logFileName[50];
 	int CaesarShift = 0;
+	
+	// readConfig function called to read from config file
+	readConfig(configFile, &timeout, logFileName, &CaesarShift);
 
-   readConfig(configFile, &timeout, logFileName, &CaesarShift);
+    //Check that the file opens properly.
+	if(!configFile)
+	{
+		perror("The config file could not be opened");
+		return -1;
+	}
     
+	/*Create new file pointer to point to logFile specified by
+	config file, appends to fiel when it writes to it.*/
+	// if logFile does not exist, creates new logFile
+	FILE* logFile;
+	logFile = fopen(logFileName, "a");
+
+
     /* 
     This section of the code initializes the GPIO
     stuff. Makes the lasers ready to lase and the
@@ -282,8 +358,8 @@ int main(const int argc, const char* const argv[])
     */
 
     GPIO_Handle gpio;
-    gpio =  initializeGPIO();//turn on gpio
-    setToOutput(gpio,17);
+    gpio =  initializeGPIO(logFile, programName);//turn on gpio
+    setToOutput(gpio,17, logFile, programName);
     //setToOutput(gpio,18);
     /*****************************************************/
 
@@ -293,13 +369,13 @@ int main(const int argc, const char* const argv[])
     values of the contents of the file. 
     */
 
-    FILE *file; //input file pointer
+    FILE *sendMsgFile; //message file pointer
 
-    file = fopen("file.txt", "r"); //set value of pointer to point to input file; will be reading from the file
+    sendMsgFile = fopen("file.txt", "r"); //set value of pointer to point to input file; will be reading from the file
 
     char inString[200]; //create array to store chars from input file
 
-    fgets(inString, 999, file); //using fgets to read from file, write contents into array
+    fgets(inString, 999, sendMsgFile); //using fgets to read from file, write contents into array
 
     int len = strlen(inString); //getting length of resulting string
 
@@ -314,7 +390,7 @@ int main(const int argc, const char* const argv[])
     for (int k = 0; k < len; k++)
     {
 	printf("1");
-        input[k] = encode(input[k], atoi(argv[1])); //encoding via encode function
+        input[k] = encode(input[k], CaesarShift); //encoding via encode function
 	
     }
 
@@ -355,9 +431,8 @@ int main(const int argc, const char* const argv[])
     */for (int j = 0; j < len; j++) //loop to send laser pulses using "Send" function
     {
 	printf("%d\n", input[j]);
-        Send(gpio, input[j]);
+        Send(gpio, input[j], configFile, logFile, programName, timeout);
     }
-    Send(gpio, 0);
 
     return 0;
 }
