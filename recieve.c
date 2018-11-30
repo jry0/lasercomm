@@ -196,7 +196,7 @@ int main(const int argc, const char* const argv[]) {
 	int len = strlen(write);
 
 	for (int i = 0; i < len; i++) {
-		writte(output, write[i])
+		writte(output, write[i]);
 	}
 	
 	//receive(gpio,output); //Receive, decode, and write the message
