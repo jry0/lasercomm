@@ -202,7 +202,7 @@ int encode(int input, int CaesarShift)
     return in;
 }
 
-void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char programName, int timeout)
+void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char* programName, int timeout)
 {
    
     int laser2 = 0; //how many times laser2 needs to blink
@@ -270,7 +270,7 @@ void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char programName, int time
             break;
         case BLINK2:
 		printf("hello");
-            gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser2
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser2 
             usleep(2000);
             laser2--;                                   //decrement laser2 counter
             gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser2
@@ -412,11 +412,11 @@ int main(const int argc, const char* const argv[])
     //how long the delay will be in secs. Implemented as int to allow for quick changing.
     //should be set higher than that of the receiving system to accomodate for inaccuracy of usleep. Sending can start after receiving has begun, but the opposite is untrue.
     
-    int delay = 11;
+    //int delay = 11;
 
-    int i = 1; //will set to '0' to break loop
+    //int i = 1; //will set to '0' to break loop
 
-    int timer = 0; // timer. Not using gettime methods because no need for precise timing here
+    //int timer = 0; // timer. Not using gettime methods because no need for precise timing here
 
     /*while (i)
     {
@@ -431,7 +431,7 @@ int main(const int argc, const char* const argv[])
     */for (int j = 0; j < len; j++) //loop to send laser pulses using "Send" function
     {
 	printf("%d\n", input[j]);
-        Send(gpio, input[j], configFile, logFile, programName, timeout);
+        Send(gpio, input[j], logFile, programName, timeout);
     }
 
     return 0;
