@@ -148,12 +148,17 @@ void readConfig(FILE* configFile, int* timeout, char* logFileName, int* CaesarSh
 //for the initialization
 GPIO_Handle initializeGPIO(FILE* logFile, char* programName)
 {       
+        // time variable to log current time
+        char time [30];
+        getTime(time);
+
         //This is the same initialization that was done in Lab 2
         GPIO_Handle gpio;
         gpio = gpiolib_init_gpio();
 
         if(gpio == NULL)
         {       
+                LOG_MSG(logFile, time, programName, "ERROR","GPIO could not be intitialized\n\n");
                 perror("Could not initialize GPIO");
         }
         LOG_MSG(logFile, time, programName, "INFO", "Pin 17 has been set to output\n\n");
@@ -164,10 +169,15 @@ GPIO_Handle initializeGPIO(FILE* logFile, char* programName)
 //so that the pin can function as an output
 void setToOutput(GPIO_Handle gpio, int pinNumber, FILE* logFile, char* programName)
 {       
+        // time variable to log current time
+        char time [30];
+        getTime(time);
+
         //Check that the gpio is functional
         if(gpio == NULL)
         {       
                 printf("The GPIO has not been intitialized properly \n");
+                LOG_MSG(logFile, time, programName, "ERROR","GPIO could not be intitialized\n\n");
                 return;
         }
         
@@ -175,6 +185,7 @@ void setToOutput(GPIO_Handle gpio, int pinNumber, FILE* logFile, char* programNa
         if(pinNumber < 2 || pinNumber > 27)
         {       
                 printf("Not a valid pinNumer \n");
+                LOG_MSG(logFile, time, programName, "ERROR","Invalid pin number\n\n");
                 return;
         }
         
@@ -190,10 +201,14 @@ void setToOutput(GPIO_Handle gpio, int pinNumber, FILE* logFile, char* programNa
         //This is the same code that was used in Lab 2, except that it uses
         //variables for the register number and the bit shift
         uint32_t sel_reg = gpiolib_read_reg(gpio, GPFSEL(1));
+
         sel_reg |= 1  << 6;
         gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
-	sel_reg |= 1<< 12;
-	gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
+        LOG_MSG(logFile, time, programName, "INFO","Pin 12 set to output\n\n");
+
+        sel_reg |= 1<< 12;
+        gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
+        LOG_MSG(logFile, time, programName, "INFO","Pin 12 set to output\n\n");
 }
 
 int encode(int input, int CaesarShift)
@@ -259,31 +274,50 @@ void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char* programName, int tim
             }
         case BLINK1:
 		printf("hi");
-            gpiolib_write_reg(gpio, GPSET(0), 1 << 15); //turn on laser1
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 12); //turn on laser1
+            getTime(time);
+            LOG_MSG(logFile, time, programName, "INFO","Laser 1 turned on\n\n");
             usleep(2000);
 		printf("bye");
             laser1--;                                   //decrement laser1 counter
-            gpiolib_write_reg(gpio, GPCLR(0), 1 << 15); 
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 12); 
+            getTime(time);
+            LOG_MSG(logFile, time, programName, "INFO","Laser 1 turned off\n\n");
 		usleep(2000);//turn off laser1
 		printf("si");
             s = HUB;
             break;
         case BLINK2:
 		printf("hello");
-            gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser2 
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 14); //turn on laser2 
+            getTime(time);
+            LOG_MSG(logFile, time, programName, "INFO","Laser 2 turned on\n\n");
             usleep(2000);
             laser2--;                                   //decrement laser2 counter
-            gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser2
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 14); //turn off laser2
+            getTime(time);
+            LOG_MSG(logFile, time, programName, "INFO","Laser 2 turned off\n\n");
             s = HUB;
 		usleep(2000);
             break;
         case BLINK_DONE:
 		printf("good");
-            gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser 1
-            gpiolib_write_reg(gpio, GPSET(0), 1 << 15); //turn on laser 2
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 12); //turn on laser 1
+            getTime(time);
+            LOG_MSG(logFile, time, programName, "INFO","Laser 1 turned on\n\n");
+
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 14); //turn on laser 2
+            getTime(time);
+            LOG_MSG(logFile, time, programName, "INFO","Laser 2 turned on\n\n");
             usleep(2000);
-            gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser 1
-            gpiolib_write_reg(gpio, GPCLR(0), 1 << 15); //turn off laser 2
+
+
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 12); //turn off laser 1
+            getTime(time);
+            LOG_MSG(logFile, time, programName, "INFO","Laser 1 turned off\n\n");
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 14); //turn off laser 2
+            getTime(time);
+            LOG_MSG(logFile, time, programName, "INFO","Laser 2 turned off\n\n");
 		usleep(2000);
             write(watchdog, "V", 1); //writes "V" to watchdog file to disable watchdog, prevents system resets
             close(watchdog); //closes watchdog file
