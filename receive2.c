@@ -91,7 +91,7 @@ void receive(GPIO_Handle gpio){
 	enum State s = START;
 	while(s != DONE){
 		laser1 = laserDiodeStatus(gpio, 1);
-		usleep(500000);
+		usleep(20);
                 laser2 = laserDiodeStatus(gpio, 2);
 		switch(s){
 			case START:
