@@ -161,7 +161,7 @@ GPIO_Handle initializeGPIO(FILE* logFile, char* programName)
                 LOG_MSG(logFile, time, programName, "ERROR","GPIO could not be intitialized\n\n");
                 perror("Could not initialize GPIO");
         }
-        LOG_MSG(logFile, time, programName, "INFO", "Pin 17 has been set to output\n\n");
+        LOG_MSG(logFile, time, programName, "INFO", "Pin has been initialized.\n\n");
         return gpio;
 }
 
@@ -204,7 +204,7 @@ void setToOutput(GPIO_Handle gpio, int pinNumber, FILE* logFile, char* programNa
 
         sel_reg |= 1  << 6;
         gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
-        LOG_MSG(logFile, time, programName, "INFO","Pin 12 set to output\n\n");
+        LOG_MSG(logFile, time, programName, "INFO","Pin 6 set to output\n\n");
 
         sel_reg |= 1<< 12;
         gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
@@ -219,7 +219,7 @@ int encode(int input, int CaesarShift)
 
 void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char* programName, int timeout)
 {
-   
+    char time[30];
     int laser2 = 0; //how many times laser2 needs to blink
 
     int laser1 = 0; //how many times laser1 needs to blink
