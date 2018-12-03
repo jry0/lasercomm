@@ -202,13 +202,13 @@ void setToOutput(GPIO_Handle gpio, int pinNumber, FILE* logFile, char* programNa
         //variables for the register number and the bit shift
         uint32_t sel_reg = gpiolib_read_reg(gpio, GPFSEL(1));
 
-        sel_reg |= 1  << 6;
+        sel_reg |= 1  << 15;
         gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
-        LOG_MSG(logFile, time, programName, "INFO","Pin 6 set to output\n\n");
-
-        sel_reg |= 1<< 12;
+        LOG_MSG(logFile, time, programName, "INFO","Pin 15 set to output\n\n");
+	
+        sel_reg |= 1<< 24;
         gpiolib_write_reg(gpio, GPFSEL(1), sel_reg);
-        LOG_MSG(logFile, time, programName, "INFO","Pin 12 set to output\n\n");
+        LOG_MSG(logFile, time, programName, "INFO","Pin 18 set to output\n\n");
 }
 
 int encode(int input, int CaesarShift)
@@ -298,7 +298,7 @@ void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char* programName, int tim
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 2 turned off\n\n");
             s = HUB;
-		usleep(2000);
+	    usleep(2000);
             break;
         case BLINK_DONE:
 		printf("good");
