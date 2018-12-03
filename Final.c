@@ -274,13 +274,13 @@ void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char* programName, int tim
             }
         case BLINK1:
 		printf("hi");
-            gpiolib_write_reg(gpio, GPSET(0), 1 << 12); //turn on laser1
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 15); //turn on laser1
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 1 turned on\n\n");
             usleep(2000);
 		printf("bye");
             laser1--;                                   //decrement laser1 counter
-            gpiolib_write_reg(gpio, GPCLR(0), 1 << 12); 
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 15); 
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 1 turned off\n\n");
 		usleep(2000);//turn off laser1
@@ -289,12 +289,12 @@ void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char* programName, int tim
             break;
         case BLINK2:
 		printf("hello");
-            gpiolib_write_reg(gpio, GPSET(0), 1 << 14); //turn on laser2 
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser2 
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 2 turned on\n\n");
             usleep(2000);
             laser2--;                                   //decrement laser2 counter
-            gpiolib_write_reg(gpio, GPCLR(0), 1 << 14); //turn off laser2
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser2
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 2 turned off\n\n");
             s = HUB;
@@ -302,20 +302,20 @@ void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char* programName, int tim
             break;
         case BLINK_DONE:
 		printf("good");
-            gpiolib_write_reg(gpio, GPSET(0), 1 << 12); //turn on laser 1
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 15); //turn on laser 1
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 1 turned on\n\n");
 
-            gpiolib_write_reg(gpio, GPSET(0), 1 << 14); //turn on laser 2
+            gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser 2
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 2 turned on\n\n");
             usleep(2000);
 
 
-            gpiolib_write_reg(gpio, GPCLR(0), 1 << 12); //turn off laser 1
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 15); //turn off laser 1
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 1 turned off\n\n");
-            gpiolib_write_reg(gpio, GPCLR(0), 1 << 14); //turn off laser 2
+            gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser 2
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 2 turned off\n\n");
 		usleep(2000);
