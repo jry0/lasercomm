@@ -277,13 +277,13 @@ void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char* programName, int tim
             gpiolib_write_reg(gpio, GPSET(0), 1 << 15); //turn on laser1
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 1 turned on\n\n");
-            usleep(2000);
+            usleep(200000);
 		printf("bye");
             laser1--;                                   //decrement laser1 counter
             gpiolib_write_reg(gpio, GPCLR(0), 1 << 15); 
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 1 turned off\n\n");
-		usleep(2000);//turn off laser1
+		usleep(200000);//turn off laser1
 		printf("si");
             s = HUB;
             break;
@@ -292,13 +292,13 @@ void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char* programName, int tim
             gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser2 
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 2 turned on\n\n");
-            usleep(2000);
+            usleep(200000);
             laser2--;                                   //decrement laser2 counter
             gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser2
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 2 turned off\n\n");
             s = HUB;
-	    usleep(2000);
+	    usleep(200000);
             break;
         case BLINK_DONE:
 		printf("good");
@@ -309,7 +309,7 @@ void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char* programName, int tim
             gpiolib_write_reg(gpio, GPSET(0), 1 << 18); //turn on laser 2
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 2 turned on\n\n");
-            usleep(2000);
+            usleep(200000);
 
 
             gpiolib_write_reg(gpio, GPCLR(0), 1 << 15); //turn off laser 1
@@ -318,7 +318,7 @@ void Send(GPIO_Handle gpio, int ascii, FILE* logFile, char* programName, int tim
             gpiolib_write_reg(gpio, GPCLR(0), 1 << 18); //turn off laser 2
             getTime(time);
             LOG_MSG(logFile, time, programName, "INFO","Laser 2 turned off\n\n");
-		usleep(2000);
+		usleep(200000);
             write(watchdog, "V", 1); //writes "V" to watchdog file to disable watchdog, prevents system resets
             close(watchdog); //closes watchdog file
             s = DONE;
